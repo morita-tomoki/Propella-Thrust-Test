@@ -35,6 +35,9 @@ const float pulsesPerRevolution = 1.0;
 int pwmValueESC = 1000;
 int pwmValueServo = 1000;
 
+unsigned long previousMillis = 0;  // 前回のデータ読み取り時間
+const long reportInterval = 1000;  // 読み取り間隔（ミリ秒）
+
 void setup() {
   initializeSerial();
   initializeINA238();
@@ -47,15 +50,16 @@ void setup() {
 void loop() {
   manageESC();
   manageServo();
-
-  reportINA238Data();
-  readLoadcell();
-  readMotorRPM();
-  reportESC_Signal();
-  reportServoSignal();
-  Serial.println("-----------------------");
-
-  delay(1000); // 1秒間隔でデータを読み取る
+  unsigned long currentMillis = millis();
+  if (currentMillis - previousMillis >= reportInterval) {
+    reportINA238Data();
+    readLoadcell();
+    readMotorRPM();
+    reportESC_Signal();
+    reportServoSignal();
+    Serial.println("-----------------------");
+    previousMillis = currentMillis;  // 最後の読み取り時間を更新
+  }
 }
 
 void initializeSerial() {
