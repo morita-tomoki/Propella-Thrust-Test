@@ -36,7 +36,7 @@ int pwmValueESC = 1000;
 int pwmValueServo = 1000;
 
 unsigned long previousMillis = 0;  // 前回のデータ読み取り時間
-const long reportInterval = 1000;  // 読み取り間隔（ミリ秒）
+const long reportInterval = 500;  // 読み取り間隔（ミリ秒）
 
 void setup() {
   initializeSerial();
@@ -57,7 +57,7 @@ void loop() {
     readMotorRPM();
     reportESC_Signal();
     reportServoSignal();
-    Serial.println("-----------------------");
+    Serial.println("");
     previousMillis = currentMillis;  // 最後の読み取り時間を更新
   }
 }
@@ -129,25 +129,25 @@ void reportINA238Data() {
   float temperature = powerMonitor.readTemperature(); // 温度を読み取る
 
   // 読み取ったデータをシリアルモニタに出力
-  Serial.print("Current: ");
+  Serial.print("C:");
   Serial.print(current);
-  Serial.println(" mA");
+  Serial.print(",");
 
-  Serial.print("Shunt Voltage: ");
+  Serial.print("SV:");
   Serial.print(shunt);
-  Serial.println(" mV");
+  Serial.print(",");
 
-  Serial.print("Voltage: ");
+  Serial.print("V:");
   Serial.print(voltage);
-  Serial.println(" V");
+  Serial.print(",");
 
-  Serial.print("Power: ");
+  Serial.print("P:");
   Serial.print(power);
-  Serial.println(" W");
+  Serial.print(",");
 
-  Serial.print("Temperature: ");
+  Serial.print("T:");
   Serial.print(temperature);
-  Serial.println(" C");  
+  Serial.print(",");  
 }
 
 void readMotorRPM() {
@@ -159,8 +159,9 @@ void readMotorRPM() {
     }
     newPulse = false;
   }  
-  Serial.print("RPM: ");
-  Serial.println(rpm);
+  Serial.print("RPM:");
+  Serial.print(rpm);
+  Serial.print(","); 
 }
 
 void manageESC() {
@@ -170,15 +171,15 @@ void manageESC() {
 }
 
 void reportESC_Signal() {
-  Serial.print("ESC_Signal: ");
+  Serial.print("ESC:");
   Serial.print(pwmValueESC);
-  Serial.println(" us");
+  Serial.print(","); 
 }
 
 void reportServoSignal() {
-  Serial.print("ServoSignal: ");
+  Serial.print("SRV:");
   Serial.print(pwmValueServo);
-  Serial.println(" us");
+  //Serial.print(","); 
 }
 
 void manageServo() {
@@ -193,11 +194,12 @@ void readLoadcell() {
   uint16_t val = adc.toAnalog(raw);
 
   // ADC値の出力
-  Serial.print("ADC Value: ");
+  Serial.print("THST:");
   Serial.print(raw);
-  Serial.print(" (");
-  Serial.print(val);
-  Serial.println(" mV)");
+  Serial.print(",");
+  //Serial.print(" (");
+  //Serial.print(val);
+  //Serial.println(" mV)");
 
   // サンプリング時間の出力
   //Serial.print("Sampling time: ");
