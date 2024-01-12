@@ -36,7 +36,7 @@ int pwmValueESC = 1000;
 int pwmValueServo = 1000;
 
 unsigned long previousMillis = 0;  // 前回のデータ読み取り時間
-const long reportInterval = 500;  // 読み取り間隔（ミリ秒）
+const long reportInterval = 10;  // 読み取り間隔（ミリ秒）
 
 void setup() {
   initializeSerial();
@@ -63,23 +63,23 @@ void loop() {
 }
 
 void initializeSerial() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   while (!Serial);
   Serial.println("Start Program");
 }
 
 void initializeINA238() {
   if (!powerMonitor.begin()) {
-    Serial.println("INA238が見つかりません。配線を確認してください。");
+    Serial.println("INA238 not found. Check your cable.");
     while (1); // エラーが発生した場合は無限ループ
   }
   if (!powerMonitor.configure()) {
-    Serial.println("INA238の設定に失敗しました。");
+    Serial.println("Failed to configure INA238.");
   }
   if (!powerMonitor.adcConfigure()) {
-    Serial.println("INA238のADC設定に失敗しました。");
+    Serial.println("Failed to configure INA238 ADC Settings.");
   }
-  Serial.println("INA238 ADC設定完了");
+  Serial.println("INA238 ADC Setting completed.");
 
   uint16_t shuntCalibrationData;
   bool success = powerMonitor.readShuntCal(shuntCalibrationData);
@@ -189,14 +189,20 @@ void manageServo() {
 }
 void readLoadcell() {
   uint32_t t1 = micros();
-  uint16_t raw = adc.read(MCP3204::Channel::SINGLE_0);
+  uint16_t raw_0 = adc.read(MCP3204::Channel::SINGLE_2);  // SINGLE_0
+  uint16_t raw_1 = adc.read(MCP3204::Channel::SINGLE_3);  // SINGLE_1
   uint32_t t2 = micros();
-  uint16_t val = adc.toAnalog(raw);
+  uint16_t val_0 = adc.toAnalog(raw_0);
+  uint16_t val_1 = adc.toAnalog(raw_1);
 
   // ADC値の出力
-  Serial.print("THST:");
-  Serial.print(raw);
+  Serial.print("THST_0:");
+  Serial.print(raw_0);
   Serial.print(",");
+  Serial.print("THST_1:");
+  Serial.print(raw_1);
+  Serial.print(",");
+  
   //Serial.print(" (");
   //Serial.print(val);
   //Serial.println(" mV)");
